@@ -22,7 +22,7 @@
 3. As shown in the images above the calculator has inverse funtions. It supports the 2 mathematical constants π and e
 
 4. It supports complex numbers. There are a few things to keep in mind while working with complex numbers. They are:
-i) Always enter the number in the format x +yi where x is the real part and y is the imaginary part.
+i) Always enter the number in the format x +yi where x is the real part and y is the imaginary part. It is neccesary to enter both real and imaginary parts and their co-efficents even if one of them is zero or one. for eg. the complex number i will be entered as 0 +1i.
 ii) The space between x and +yi is important.
 iii) The plus can be a minus sign incase the imaginary part is negetive.
 iv) The numbers cannot be raised to complex powers or complex roots yet. For instance e^iπ wont work.
