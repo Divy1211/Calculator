@@ -2,8 +2,12 @@ package GUI.Calculator;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.DecimalFormat;
 public class calculator {
 	static double a;
+	static String pa[],pb[];
+	static DecimalFormat format = new DecimalFormat("0.#");
+	static double Ima,Rea,Imb,Reb,Imn,Ren,par,pat,pbr,pbt,pnr,pnt,x;
 	static int op;
 	public static int[] sort(int a[]) {
 		int c = 0,d,h;
@@ -117,7 +121,7 @@ public class calculator {
 		option[2] = new JButton("*");
 		option[3] = new JButton("/");
 		option[4] = new JButton("x\u221A(y)");
-		option[5] = new JButton("x^y");
+		option[5] = new JButton("xʸ");
 		option[6] = new JButton("x!");
 		option[7] = new JButton("Sin");
 		option[8] = new JButton("Cos");
@@ -125,24 +129,30 @@ public class calculator {
 		option[10] = new JButton("Cot");
 		option[11] = new JButton("Sec");
 		option[12] = new JButton("Cosec");
-		option[13] = new JButton("Log y(x)");
+		option[13] = new JButton("Log\u2093y");
 		option[14] = new JButton("Sort");
 		option[15] = new JButton("=");
 		JButton pi = new JButton("\u03C0");
-		pi.setBounds(935,215,50,30);
+		JButton i = new JButton("i");
+		i.setBounds(920,6,50,30);
+		i.setFont(new Font("Times New Roman", Font.PLAIN, 25));
+		pi.setBounds(830,210,50,30);
 		pi.setFont(new Font("Times New Roman", Font.PLAIN, 25));
 		JCheckBox inv = new JCheckBox("Inverse");
 		inv.setBounds(730,210,100,30);
 		inv.setFont(new Font("Times New Roman", Font.PLAIN, 25));
 		JCheckBox deg = new JCheckBox("Degrees", true);	
-		deg.setBounds(830,210,110,30);
+		deg.setBounds(880,210,110,30);
 		deg.setFont(new Font("Times New Roman", Font.PLAIN, 25));
 		JTextArea input = new JTextArea("Enter");
-		input.setBounds(730,10,260,200);
+		input.setBounds(730,40,260,170);
 		input.setBorder(BorderFactory.createEtchedBorder());
 		input.setFont(new Font("Times New Roman", Font.PLAIN, 25));
 		input.setLineWrap(true);
 		input.setWrapStyleWord(true);
+		JCheckBox com = new JCheckBox("Complex mode", false);	
+		com.setBounds(730,10,185,30);
+		com.setFont(new Font("Times New Roman", Font.PLAIN, 25));
 		int c = 0,x = 10,y = 10;
 		while(c < 16) {
 			option[c].setBounds(x,y,170,50);
@@ -171,8 +181,10 @@ public class calculator {
 		inv.setToolTipText("Inverse Trigonometric and AntiLog functions");
 		deg.setToolTipText(" Degrees or Radians");
 		p.add(pi);
+		p.add(i);
 		p.add(inv);
 		p.add(deg);
+		p.add(com);
 		p.add(input);
 		f.add(p);
 		f.setVisible(true);
@@ -181,6 +193,10 @@ public class calculator {
 			public void itemStateChanged(ItemEvent e) {
 				int d = 7;
 				if(inv.isSelected()) {
+					if(com.isSelected()) {
+						option[6].setText("To Rect.");
+						option[6].setToolTipText("Convert the given complex number to Rectangular form");
+					}
 					while(d < 13) {
 						option[d].setText("arc"+option[d].getText());
 						option[d].setToolTipText("Trigonometric function "+option[d].getText());
@@ -192,6 +208,10 @@ public class calculator {
 					pi.setToolTipText("Math Constant e");
 				}
 				else {
+					if(com.isSelected()) {
+						option[6].setText("To Polar");
+						option[6].setToolTipText("Convert the given complex number to polar form");
+					}
 					while(d < 13) {
 						String split[] = option[d].getText().split("c",2);
 						option[d].setText(split[1]);
@@ -213,17 +233,53 @@ public class calculator {
 					deg.setText("Radians");
 			}
 		});
+		com.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if(com.isSelected()) {
+					input.setText("Enter in x +yi format");
+					if(inv.isSelected()) {
+						option[6].setText("To Rect.");
+						option[6].setToolTipText("Convert the given complex number to Rectangular form");
+					}
+					else {
+						option[6].setText("To Polar");
+						option[6].setToolTipText("Convert the given complex number to polar form");
+					}
+					int s = 7;
+					while(s < 15)
+						option[s++].setEnabled(false);
+				}	
+				else {
+					option[6].setText("x!");
+					option[6].setToolTipText("x(x-1)(x-2)...1");
+					int s = 7;
+					input.setText("Enter");
+					while(s < 15)
+						option[s++].setEnabled(true);
+				}
+			}
+		});
+		i.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(com.isSelected())
+					input.append("i");
+			}
+		});
 		pi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(inv.isSelected())
-					input.setText(""+Math.E);
+					input.append(""+Math.E);
 				else
-					input.setText(""+Math.PI);
+					input.append(""+Math.PI);
 			}
 		});
 		option[0].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a = Double.parseDouble(input.getText());
+				if(com.isSelected()) {
+					pa = input.getText().split(" ");
+				}
+				else
+					a = Double.parseDouble(input.getText());
 				input.setText("");
 				op = 1;
 				input.requestFocus();
@@ -231,7 +287,11 @@ public class calculator {
 		});
 		option[1].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a = Double.parseDouble(input.getText());
+				if(com.isSelected()) {
+					pa = input.getText().split(" ");
+				}
+				else
+					a = Double.parseDouble(input.getText());
 				input.setText("");
 				op = 2;
 				input.requestFocus();
@@ -239,7 +299,11 @@ public class calculator {
 		});
 		option[2].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a = Double.parseDouble(input.getText());
+				if(com.isSelected()) {
+					pa = input.getText().split(" ");
+				}
+				else
+					a = Double.parseDouble(input.getText());
 				input.setText("");
 				op = 3;
 				input.requestFocus();
@@ -247,7 +311,11 @@ public class calculator {
 		});
 		option[3].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a = Double.parseDouble(input.getText());
+				if(com.isSelected()) {
+					pa = input.getText().split(" ");
+				}
+				else
+					a = Double.parseDouble(input.getText());
 				input.setText("");
 				op = 4;
 				input.requestFocus();
@@ -255,7 +323,11 @@ public class calculator {
 		});
 		option[4].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a = Double.parseDouble(input.getText());
+				if(com.isSelected()) {
+					pa = input.getText().split(" ");
+				}
+				else
+					a = Double.parseDouble(input.getText());
 				input.setText("");
 				op = 5;
 				input.requestFocus();
@@ -263,7 +335,11 @@ public class calculator {
 		});
 		option[5].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				a = Double.parseDouble(input.getText());
+				if(com.isSelected()) {
+					pa = input.getText().split(" ");
+				}
+				else
+					a = Double.parseDouble(input.getText());
 				input.setText("");
 				op = 6;
 				input.requestFocus();
@@ -271,13 +347,69 @@ public class calculator {
 		});
 		option[6].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				long f = 1;
-				long b = Long.parseLong(input.getText());
-				while(b > 0) {
-					f = b*f;
-					b--;
+				if(com.isSelected()) {
+					if(inv.isSelected()) {
+						String part[] = input.getText().split("<");
+						pnr = Double.parseDouble(part[0]);
+						pnt = Double.parseDouble(part[1]);
+						if(deg.isSelected()) {
+							Ren = pnr*cos(Math.toRadians(pnt));
+							Imn = pnr*sin(Math.toRadians(pnt));
+						}
+						else{
+							Ren = pnr*cos(pnt);
+							Imn = pnr*sin(pnt);
+						}
+						Ren = Math.round(Ren*10000000000.0);
+						Ren = Ren/10000000000.0;
+						Imn = Math.round(Imn*10000000000.0);
+						Imn = Imn/10000000000.0;
+						if(Ren == 0) {
+							if(Imn == 0)
+								input.setText("0");
+							else
+								input.setText(((Imn%1==0)?format.format(Imn):Imn)+"i");
+						}
+						else {
+							if(Imn > 0)
+								input.setText((Ren%1==0?format.format(Ren):Ren)+" +"+((Imn%1==0)?format.format(Imn):Imn)+"i");
+							else if(Imn == 0)
+								input.setText(""+((Ren%1==0)?format.format(Ren):Ren));
+							else if(Imn < 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" "+((Imn%1==0)?format.format(Imn):Imn)+"i");
+						}
+					}
+					else {
+						pa = input.getText().split(" ");
+						pa[1] = pa[1].replaceAll("i","");
+						Rea = Double.parseDouble(pa[0]);
+						Ima = Double.parseDouble(pa[1]);
+						par = Math.sqrt(Rea*Rea+Ima*Ima);
+						pat = arccos(Rea/par);
+						par = Math.round(par*10000000000.0);
+						par = par/10000000000.0;
+						if(!deg.isSelected()) {
+							pat = Math.toRadians(pat);
+							pat = Math.round(pat*10000000000.0);
+							pat = pat/10000000000.0;
+							input.setText(format.format(par)+"<"+pat);
+						}
+						else {
+							pat = Math.round(pat*10000000000.0);
+							pat = pat/10000000000.0;
+							input.setText(format.format(par)+"<"+format.format(pat));
+						}
+					}
 				}
-				input.setText(""+f);
+				else {
+					long f = 1;
+					long b = Long.parseLong(input.getText());
+					while(b > 0) {
+						f = b*f;
+						b--;
+					}
+					input.setText(""+f);
+				}
 			}
 		});
 		option[7].addActionListener(new ActionListener() {
@@ -433,47 +565,231 @@ public class calculator {
 				double ans = 0;
 				switch(op) {
 				case 1 :
-					ans = Double.parseDouble(input.getText());
-					ans = a+ans;
-					ans = Math.round(ans*10000000000.0);
-					ans = ans/10000000000.0;
-					input.setText(""+ans);
+					if(com.isSelected()) {
+						pb = input.getText().split(" ");
+						pa[1] = pa[1].replaceAll("i", "");
+						pb[1] = pb[1].replaceAll("i", "");
+						Rea = Double.parseDouble(pa[0])+Double.parseDouble(pb[0]);
+						Ima = Double.parseDouble(pa[1])+Double.parseDouble(pb[1]);
+						if(Rea == 0) {
+							if(Ima == 0)
+								input.setText("0");
+							else
+								input.setText(((Ima%1==0)?format.format(Ima):Ima)+"i");
+						}
+						else {
+							if(Ima > 0)
+								input.setText((Rea%1==0?format.format(Rea):Rea)+" +"+((Ima%1==0)?format.format(Ima):Ima)+"i");
+							else if(Ima == 0)
+								input.setText(""+((Rea%1==0)?format.format(Rea):Rea));
+							else if(Ima < 0)
+								input.setText(((Rea%1==0)?format.format(Rea):Rea)+" "+((Ima%1==0)?format.format(Ima):Ima)+"i");
+						}
+					}
+					else {
+						ans = Double.parseDouble(input.getText());
+						ans = a+ans;
+						ans = Math.round(ans*10000000000.0);
+						ans = ans/10000000000.0;
+						input.setText(""+ans);
+					}
 					break;
 				case 2 :
-					ans = Double.parseDouble(input.getText());
-					ans = a-ans;
-					ans = Math.round(ans*10000000000.0);
-					ans = ans/10000000000.0;
-					input.setText(""+ans);
+					if(com.isSelected()) {
+						pb = input.getText().split(" ");
+						pa[1] = pa[1].replaceAll("i", "");
+						pb[1] = pb[1].replaceAll("i", "");
+						Rea = Double.parseDouble(pa[0])-Double.parseDouble(pb[0]);
+						Ima = Double.parseDouble(pa[1])-Double.parseDouble(pb[1]);
+						if(Rea == 0) {
+							if(Ima == 0)
+								input.setText("0");
+							else
+								input.setText(((Ima%1==0)?format.format(Ima):Ima)+"i");
+						}
+						else {
+							if(Ima > 0)
+								input.setText((Rea%1==0?format.format(Rea):Rea)+" +"+((Ima%1==0)?format.format(Ima):Ima)+"i");
+							else if(Ima == 0)
+								input.setText(""+((Rea%1==0)?format.format(Rea):Rea));
+							else if(Ima < 0)
+								input.setText(((Rea%1==0)?format.format(Rea):Rea)+" "+((Ima%1==0)?format.format(Ima):Ima)+"i");
+						}
+					}
+					else {
+						ans = Double.parseDouble(input.getText());
+						ans = a-ans;
+						ans = Math.round(ans*10000000000.0);
+						ans = ans/10000000000.0;
+						input.setText(""+ans);
+					}
 					break;
 				case 3 :
-					ans = Double.parseDouble(input.getText());
-					ans = a*ans;
-					ans = Math.round(ans*10000000000.0);
-					ans = ans/10000000000.0;
-					input.setText(""+ans);
+					if(com.isSelected()) {
+						pb = input.getText().split(" ");
+						pa[1] = pa[1].replaceAll("i", "");
+						pb[1] = pb[1].replaceAll("i", "");
+						Rea = Double.parseDouble(pa[0]);
+						Reb = Double.parseDouble(pb[0]);
+						Ima = Double.parseDouble(pa[1]);
+						Imb = Double.parseDouble(pb[1]);
+						par = Math.sqrt(Rea*Rea+Ima*Ima);
+						pbr = Math.sqrt(Reb*Reb+Imb*Imb);
+						pat = arccos(Rea/par);
+						pbt = arccos(Reb/pbr);
+						pnr = par*pbr;
+						pnt = pat+pbt;
+						Ren = pnr*cos(Math.toRadians(pnt));
+						Imn = pnr*sin(Math.toRadians(pnt));
+						Ren = Math.round(Ren*10000000000.0);
+						Ren = Ren/10000000000.0;
+						Imn = Math.round(Imn*10000000000.0);
+						Imn = Imn/10000000000.0;
+						if(Ren == 0) {
+							if(Imn == 0)
+								input.setText("0");
+							else
+								input.setText((Imn%1==0)?format.format(Imn):Imn+"i");
+						}
+						else {
+							if(Imn > 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" +"+((Imn%1==0)?format.format(Imn):Imn)+"i");
+							else if(Imn == 0)
+								input.setText(""+((Ren%1==0)?format.format(Ren):Ren));
+							else if(Imn < 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" "+((Imn%1==0)?format.format(Imn):Imn)+"i");
+						}
+					}
+					else {
+						ans = Double.parseDouble(input.getText());
+						ans = a*ans;
+						ans = Math.round(ans*10000000000.0);
+						ans = ans/10000000000.0;
+						input.setText(""+ans);
+					}
 					break;
 				case 4 :
-					ans = Double.parseDouble(input.getText());
-					ans = a/ans;
-					ans = Math.round(ans*10000000000.0);
-					ans = ans/10000000000.0;
-					input.setText(""+ans);
+					if(com.isSelected()) {
+						pb = input.getText().split(" ");
+						pa[1] = pa[1].replaceAll("i", "");
+						pb[1] = pb[1].replaceAll("i", "");
+						Rea = Double.parseDouble(pa[0]);
+						Reb = Double.parseDouble(pb[0]);
+						Ima = Double.parseDouble(pa[1]);
+						Imb = Double.parseDouble(pb[1]);
+						par = Math.sqrt(Rea*Rea+Ima*Ima);
+						pbr = Math.sqrt(Reb*Reb+Imb*Imb);
+						pat = arccos(Rea/par);
+						pbt = arccos(Reb/pbr);
+						pnr = par/pbr;
+						pnt = pat-pbt;
+						Ren = pnr*cos(Math.toRadians(pnt));
+						Imn = pnr*sin(Math.toRadians(pnt));
+						Ren = Math.round(Ren*10000000000.0);
+						Ren = Ren/10000000000.0;
+						Imn = Math.round(Imn*10000000000.0);
+						Imn = Imn/10000000000.0;
+						if(Ren == 0) {
+							if(Imn == 0)
+								input.setText("0");
+							else
+								input.setText((Imn%1==0)?format.format(Imn):Imn+"i");
+						}
+						else {
+							if(Imn > 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" +"+((Imn%1==0)?format.format(Imn):Imn)+"i");
+							else if(Imn == 0)
+								input.setText(""+((Ren%1==0)?format.format(Ren):Ren));
+							else if(Imn < 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" "+((Imn%1==0)?format.format(Imn):Imn)+"i");
+						}
+					}
+					else {
+						ans = Double.parseDouble(input.getText());
+						ans = a/ans;
+						ans = Math.round(ans*10000000000.0);
+						ans = ans/10000000000.0;
+						input.setText(""+ans);
+					}
 					break;
 				case 5 :
-					ans = Double.parseDouble(input.getText());
-					ans = Math.pow(ans,1/a);
-					input.setText(""+ans);
+					if(com.isSelected()) {
+						pa[1] = pa[1].replaceAll("i", "");
+						double pow = Double.parseDouble(input.getText());
+						Rea = Double.parseDouble(pa[0]);
+						Ima = Double.parseDouble(pa[1]);
+						par = Math.sqrt(Rea*Rea+Ima*Ima);
+						pat = arccos(Rea/par);
+						pnr = Math.pow(par, 1/pow);
+						pnt = pat/pow;
+						Ren = pnr*cos(Math.toRadians(pnt));
+						Imn = pnr*sin(Math.toRadians(pnt));
+						Ren = Math.round(Ren*10000000000.0);
+						Ren = Ren/10000000000.0;
+						Imn = Math.round(Imn*10000000000.0);
+						Imn = Imn/10000000000.0;
+						if(Ren == 0) {
+							if(Imn == 0)
+								input.setText("0");
+							else
+								input.setText(((Imn%1==0)?format.format(Imn):Imn)+"i");
+						}
+						else {
+							if(Imn > 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" +"+((Imn%1==0)?format.format(Imn):Imn)+"i");
+							else if(Imn == 0)
+								input.setText(""+((Ren%1==0)?format.format(Ren):Ren));
+							else if(Imn < 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" "+((Imn%1==0)?format.format(Imn):Imn)+"i");
+						}
+					}
+					else {
+						ans = Double.parseDouble(input.getText());
+						ans = Math.pow(ans,1/a);
+						input.setText(""+ans);
+					}
 					break;
 				case 6 :
-					ans = Double.parseDouble(input.getText());
-					ans = Math.pow(a,ans);
-					input.setText(""+ans);
+					if(com.isSelected()) {
+						pa[1] = pa[1].replaceAll("i", "");
+						double pow = Double.parseDouble(input.getText());
+						Rea = Double.parseDouble(pa[0]);
+						Ima = Double.parseDouble(pa[1]);
+						par = Math.sqrt(Rea*Rea+Ima*Ima);
+						pat = arccos(Rea/par);
+						pnr = Math.pow(par, pow);
+						pnt = pat*pow;
+						Ren = pnr*cos(Math.toRadians(pnt));
+						Imn = pnr*sin(Math.toRadians(pnt));
+						Ren = Math.round(Ren*10000000000.0);
+						Ren = Ren/10000000000.0;
+						Imn = Math.round(Imn*10000000000.0);
+						Imn = Imn/10000000000.0;
+						if(Ren == 0) {
+							if(Imn == 0)
+								input.setText("0");
+							else
+								input.setText(((Imn%1==0)?format.format(Imn):Imn)+"i");
+						}
+						else {
+							if(Imn > 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" +"+((Imn%1==0)?format.format(Imn):Imn)+"i");
+							else if(Imn == 0)
+								input.setText(""+((Ren%1==0)?format.format(Ren):Ren));
+							else if(Imn < 0)
+								input.setText(((Ren%1==0)?format.format(Ren):Ren)+" "+((Imn%1==0)?format.format(Imn):Imn)+"i");
+						}
+					}
+					else {
+						ans = Double.parseDouble(input.getText());
+						ans = Math.pow(a,ans);
+						input.setText(""+ans);
+					}
 					break;
 				case 7 :
 					ans = Double.parseDouble(input.getText());
 					if(inv.isSelected() == false)
-						input.setText(""+Math.log10(a)/Math.log10(ans));
+						input.setText(""+Math.log10(ans)/Math.log10(a));
 					else
 						input.setText(""+Math.pow(ans, a));
 				}
